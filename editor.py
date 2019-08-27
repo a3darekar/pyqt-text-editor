@@ -174,13 +174,17 @@ class MainWindow(QMainWindow):
 	def file_open(self):
 		path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Text documents (*.txt);All files (*.*)")
 		if path:
-			try:
-				with open(path, 'r') as f:
-					text = f.read()
-					self.add_new_tab(path, text)
+			_open_file_tab(path)
 
-			except Exception as e:
-				self.dialog_critical(str(e))
+	def _open_file_tab(self, path):
+		try:
+			with open(path, 'r') as f:
+				text = f.read()
+				self.add_new_tab(path, text)
+				self.paths.append(path)
+
+		except Exception as e:
+			self.dialog_critical(str(e))
 
 	def create_editor(self, text):
 		editor = QTextEdit(text)
@@ -211,7 +215,6 @@ class MainWindow(QMainWindow):
 		self.current_editor = editor
 		self.paths.append(label)
 		self.path = label
-		self.change_text_editor(self.tabs.currentIndex())
 
 	def file_save(self):
 		if self.path == "Untitled":
