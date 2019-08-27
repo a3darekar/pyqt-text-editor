@@ -2,48 +2,16 @@ import os
 import sys
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QFontDatabase, QIcon, QPixmap
+from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtPrintSupport import QPrintDialog
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QToolBar, QStatusBar, QVBoxLayout, QPlainTextEdit, \
-	QAction, QFileDialog, QMessageBox, QTextEdit, QFontComboBox, QComboBox, QWidgetAction, QDialog, QLabel, \
-	QDialogButtonBox
-
-
-class AboutDialog(QDialog):
-	def __init__(self, *args, **kwargs):
-		super(AboutDialog, self).__init__(*args, **kwargs)
-
-		quitButton = QDialogButtonBox.Ok  # No cancel
-		self.buttonBox = QDialogButtonBox(quitButton)
-		self.buttonBox.accepted.connect(self.accept)
-		self.buttonBox.rejected.connect(self.reject)
-
-		layout = QVBoxLayout()
-
-		title = QLabel("Text Editor")
-		font = title.font()
-		font.setPointSize(20)
-		title.setFont(font)
-
-		layout.addWidget(title)
-
-		logo = QLabel()
-		logo.setPixmap(QPixmap(os.path.join('icons', 'ma-icon-128.png')))
-		layout.addWidget(logo)
-
-		layout.addWidget(QLabel("Developed by Knowhere1998 (Amey Darekar)"))
-
-		for i in range(0, layout.count()):
-			layout.itemAt(i).setAlignment(Qt.AlignHCenter)
-
-		layout.addWidget(self.buttonBox)
-
-		self.setLayout(layout)
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QToolBar, QStatusBar, QAction, QFileDialog, \
+	QMessageBox, QTextEdit, QFontComboBox, QComboBox, QWidgetAction, QDialog
+from about import AboutDialog
 
 
 # noinspection PyPep8Naming
 class MainWindow(QMainWindow):
-	
+
 	def __init__(self, *args, **kwargs):
 		super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -51,10 +19,8 @@ class MainWindow(QMainWindow):
 		self.setWindowTitle('Text Editor')
 		self.setWindowIcon(QIcon('favicon.png'))
 
-		self.current_editor = self.create_editor(text='')
 		self.editors = []
 		self.paths = []
-
 		self.path = None
 
 		self.tabs = QTabWidget()
@@ -82,10 +48,10 @@ class MainWindow(QMainWindow):
 
 		menubar_items = {
 			'&File': [
-				("&New", "Ctrl+N", self.add_new_tab),
-				("&Open", "Ctrl+O", self.file_open),
-				("&Save", "Ctrl+S", self.save_document),
-				("&Save", "Ctrl+Shift+S", self.save_as),
+				("&New File", "Ctrl+N", self.add_new_tab),
+				("&Open File", "Ctrl+O", self.file_open),
+				("&Save File", "Ctrl+S", self.file_save),
+				("&Save File as", "Ctrl+Shift+S", self.save_as),
 				("&Print", "Ctrl+P", self.print_document),
 				None,
 				("&Quit", "Ctrl+Q", self.quit),
@@ -107,7 +73,7 @@ class MainWindow(QMainWindow):
 				("&Align Justify", "", self.align_justify)
 			],
 			'&About': [
-				("&About Us", "", self.about),
+				("&About Us", "Ctrl+H", self.about),
 				None,
 				("&Help", "", self.help)
 			]
@@ -147,7 +113,7 @@ class MainWindow(QMainWindow):
 		font_family = QWidgetAction(self)
 		font_family.setDefaultWidget(fontBox)
 		# Settings Menubar
-		settings = menubar.addMenu('&Settings')
+		settings = menubar.addMenu('&Font Settings')
 		menu_font = settings.addMenu("&Font")
 		menu_font.addAction(font_family)
 
@@ -156,29 +122,25 @@ class MainWindow(QMainWindow):
 		menu_size = settings.addMenu("&Font Size")
 		menu_size.addAction(font_size)
 
-	def about(self):
-		dlg = AboutDialog()
-		dlg.exec_()
-
 	def configure_toolbar(self):
 		items = (
-			('icons/new.png', 'New', self.add_new_tab),
-			('icons/open.png', 'Open', self.file_open),
-			('icons/save.png', 'Save', self.save_document),
-			('icons/save_as.png', 'Save As', self.save_as),
+			('icons/new.png', 'New (Ctrl + N)', self.add_new_tab),
+			('icons/open.png', 'Open (Ctrl + O)', self.file_open),
+			('icons/save.png', 'Save (Ctrl + S)', self.file_save),
+			('icons/save_as.png', 'Save As  (Ctrl + Shift + S)', self.save_as),
 			None,
-			('icons/cut.png', 'Cut', self.cut_document),
-			('icons/copy.png', 'Copy', self.copy_document),
-			('icons/paste.png', 'Paste', self.paste_document),
+			('icons/cut.png', 'Cut (Ctrl + X)', self.cut_document),
+			('icons/copy.png', 'Copy (Ctrl + C)', self.copy_document),
+			('icons/paste.png', 'Paste (Ctrl + V)', self.paste_document),
 			None,
-			('icons/undo.png', 'Undo', self.undo_document),
-			('icons/redo.png', 'Redo', self.redo_document),
+			('icons/undo.png', 'Undo (Ctrl + Z)', self.undo_document),
+			('icons/redo.png', 'Redo (Ctrl + Y)', self.redo_document),
 			None,
-			('icons/print.png', 'Print', self.print_document),
+			('icons/print.png', 'Print (Ctrl + P)', self.print_document),
 			None,
-			('icons/quit.png', 'Quit', self.quit),
+			('icons/quit.png', 'Quit (Ctrl + Q)', self.quit),
 			None,
-			('icons/question.png', 'Help', self.help),
+			('icons/question.png', 'Help (Ctrl + H)', self.help),
 		)
 		self.toolbar = self.addToolBar("Toolbar")
 
@@ -190,6 +152,10 @@ class MainWindow(QMainWindow):
 				self.toolbar.addAction(action)
 			else:
 				self.toolbar.addSeparator()
+
+	def about(self):
+		dlg = AboutDialog()
+		dlg.exec_()
 
 	def configure_statusBar(self):
 		self.status = QStatusBar()
@@ -212,7 +178,6 @@ class MainWindow(QMainWindow):
 				with open(path, 'r') as f:
 					text = f.read()
 					self.add_new_tab(path, text)
-					self.update_title()
 
 			except Exception as e:
 				self.dialog_critical(str(e))
@@ -220,7 +185,7 @@ class MainWindow(QMainWindow):
 	def create_editor(self, text):
 		editor = QTextEdit(text)
 		fixedfont = QFontDatabase.systemFont(QFontDatabase.FixedFont)
-		fixedfont.setPointSize(12)
+		fixedfont.setPointSize(16)
 		editor.setFont(fixedfont)
 		return editor
 
@@ -228,36 +193,12 @@ class MainWindow(QMainWindow):
 		self.tabs.removeTab(index)
 		if index < len(self.editors):
 			del self.editors[index]
-
-	def save_document(self):
-		if not self.path:
-			new_path, _ = QFileDialog.getSaveFileName(self, 'Save File')
-		else:
-			new_path = self.path
-		try:
-			file = open(new_path, 'w')
-			if file:
-				text = self.current_editor.toPlainText()
-				file.write(text)
-				file.close()
-			index = self.tabs.currentIndex()
-			self.paths[index] = new_path
-
-		except Exception as e:
-			self.dialog_critical(str(e))
+			del self.paths[index]
 
 	def save_as(self):
 		new_path, _ = QFileDialog.getSaveFileName(self, 'Save File')
-		try:
-			file = open(new_path, 'w')
-			if file:
-				text = self.current_editor.toPlainText()
-				file.write(text)
-				file.close()
-			index = self.tabs.currentIndex()
-			self.paths[index] = new_path
-		except Exception as e:
-			self.dialog_critical(str(e))
+		if new_path:
+			self._save_to_path(new_path)
 
 	def print_document(self):
 		print_dialog = QPrintDialog()
@@ -265,21 +206,33 @@ class MainWindow(QMainWindow):
 			self.current_editor.document().print_(print_dialog.printer())
 
 	def add_new_tab(self, label='Untitled', text=''):
-		self.current_editor = self.create_editor(text)
-		index = self.tabs.currentIndex()
-		if index != -1:
-			if self.paths[index]:
-				label = self.paths[index]
-		self.tabs.addTab(self.current_editor, label)
-		self.update_title()
+		editor = self.create_editor(text)
+		self.tabs.addTab(editor, label)
+		self.current_editor = editor
 		self.paths.append(label)
+		self.path = label
+		self.change_text_editor(self.tabs.currentIndex())
 
 	def file_save(self):
-		if self.path is None:
+		if self.path == "Untitled":
 			# If we do not have a path, we need to use Save As.
 			return self.file_saveas()
 
 		self._save_to_path(self.path)
+
+	def _save_to_path(self, path):
+		index = self.tabs.currentIndex()
+		self.paths[index] = path
+		self.path = path
+		try:
+			file = open(path, 'w')
+			if file:
+				text = self.current_editor.toPlainText()
+				file.write(text)
+				file.close()
+
+		except Exception as e:
+			self.dialog_critical(str(e))
 
 	def tab_open_doubleclick(self, i):
 		if i == -1:
@@ -293,11 +246,13 @@ class MainWindow(QMainWindow):
 		self.setWindowTitle("%s - Text Editor" % (self.path if self.path else "Untitled"))
 
 	def close_current_tab(self, i):
-		if self.tabs.count() < 2:
+		self.tabs.removeTab(i)
+		if self.tabs.count() < 1:
 			self.quit()
 		else:
+			index = self.tabs.currentIndex()
+			self.path = self.paths[index]
 			self.update_title()
-		self.tabs.removeTab(i)
 
 	def quit(self):
 		self.close()
