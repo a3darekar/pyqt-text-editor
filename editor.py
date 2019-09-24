@@ -7,6 +7,7 @@ from PyQt5.QtPrintSupport import QPrintDialog
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QToolBar, QStatusBar, QAction, QFileDialog, \
 	QMessageBox, QTextEdit, QFontComboBox, QComboBox, QWidgetAction, QDialog
 from about import AboutDialog
+import webbrowser
 
 
 # noinspection PyPep8Naming
@@ -156,6 +157,7 @@ class MainWindow(QMainWindow):
 	def about(self):
 		dlg = AboutDialog()
 		dlg.exec_()
+		return dlg
 
 	def configure_statusBar(self):
 		self.status = QStatusBar()
@@ -200,7 +202,7 @@ class MainWindow(QMainWindow):
 			del self.paths[index]
 
 	def save_as(self):
-		new_path, _ = QFileDialog.getSaveFileName(self, 'Save File')
+		new_path, _ = QFileDialog.getSaveFileName(self, 'Save File As')
 		if new_path:
 			self._save_to_path(new_path)
 
@@ -300,8 +302,7 @@ class MainWindow(QMainWindow):
 		self.current_editor.setFontPointSize(int(fontsize))
 
 	def help(self):
-		## TODO: Write Help Text
-		pass
+		return webbrowser.open("https://github.com/knowhere1998/pyqt-text-editor")
 
 
 if __name__ == '__main__':
