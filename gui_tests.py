@@ -131,7 +131,7 @@ class EditorOperationTests(TestCase):
 		cursor.insertText(text)
 
 
-class AboutWindowTestCases(TestCase):
+class SupportFeatureTestCases(TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls.app = QApplication(sys.argv)
