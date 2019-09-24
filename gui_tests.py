@@ -1,14 +1,27 @@
 import sys
 from unittest import TestCase
+
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor
 import unittest
+
+from PyQt5.QtTest import QTest
+from PyQt5.QtWidgets import QFileDialog
+from pytestqt.plugin import qtbot
 
 from editor import MainWindow, QApplication
 
 
 class FileOperationTests(TestCase):
-	app = QApplication(sys.argv)
-	window = MainWindow()
+	@classmethod
+	def setUpClass(cls):
+		cls.app = QApplication(sys.argv)
+		cls.window = MainWindow()
+		cls.window.show()
+
+	@classmethod
+	def tearDownClass(cls):
+		cls.app.exit()
 
 	###
 	#
@@ -42,10 +55,33 @@ class FileOperationTests(TestCase):
 
 		self.assertEqual(self.window.current_editor.toPlainText(), file_text)
 
+	def test_file_save_as(self):
+		text = "Lorem Ipsum dolor sit amet."
+		cursor = QTextCursor(self.window.current_editor.document())
+		cursor.insertText(text)
+
+		new_path, _ = QFileDialog.getSaveFileName(self.window, 'Save File As')
+		if new_path:
+			self.window._save_to_path(new_path)
+
+			file = open(new_path, 'r')
+			file_text = file.read()
+			file.close()
+			self.assertEqual(self.window.current_editor.toPlainText(), file_text)
+		else:
+			self.assertTrue(True, "File path not selected")
+
 
 class EditorOperationTests(TestCase):
-	app = QApplication(sys.argv)
-	window = MainWindow()
+	@classmethod
+	def setUpClass(cls):
+		cls.app = QApplication(sys.argv)
+		cls.window = MainWindow()
+		cls.window.show()
+
+	@classmethod
+	def tearDownClass(cls):
+		cls.app.exit()
 
 	###
 	#
@@ -53,7 +89,7 @@ class EditorOperationTests(TestCase):
 	#
 	###
 	def test_cut(self):
-		text = "Hello"
+		text = "text"
 		self.write_data(text)
 		self.window.current_editor.selectAll()
 		self.window.cut_document()
@@ -68,7 +104,7 @@ class EditorOperationTests(TestCase):
 	#
 	###
 	def test_copy(self):
-		text = "Hello"
+		text = "text"
 		self.write_data(text)
 		self.window.current_editor.selectAll()
 		self.window.copy_document()
@@ -94,6 +130,29 @@ class EditorOperationTests(TestCase):
 		cursor = QTextCursor(self.window.current_editor.document())
 		cursor.insertText(text)
 
+
+class AboutWindowTestCases(TestCase):
+	@classmethod
+	def setUpClass(cls):
+		cls.app = QApplication(sys.argv)
+		cls.window = MainWindow()
+		cls.window.show()
+
+	@classmethod
+	def tearDownClass(cls):
+		cls.app.exit()
+
+	def test_aboutDialogVisible(self):
+		aboutWindow = self.window.about()
+		self.assertTrue(self.window.isVisible(), "Visible")
+		# print(QTest.mouseClick(aboutWindow.buttonBox, Qt.LeftButton))
+		# self.assertTrue(self.window.isVisible() == False, "Not Visible")
+
+	def test_help_launchWebBrowser(self):
+		helpResonse = self.window.help()
+		self.assertTrue(helpResonse, "Browser Launched")
+		# print(QTest.mouseClick(aboutWindow.buttonBox, Qt.LeftButton))
+		# self.assertTrue(self.window.isVisible() == False, "Not Visible")
 
 if __name__ == '__main__':
 	unittest.main()
