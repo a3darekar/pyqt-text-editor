@@ -30,7 +30,6 @@ class FileOperationTests(TestCase):
 	###
 	def test_file_open(self):
 		self.window._open_file_tab('/home/amey/test')
-
 		file = open('/home/amey/test', 'r')
 		text = file.read()
 		file.close()
@@ -64,6 +63,23 @@ class FileOperationTests(TestCase):
 		if new_path:
 			self.window._save_to_path(new_path)
 
+			file = open(new_path, 'r')
+			file_text = file.read()
+			file.close()
+			self.assertEqual(self.window.current_editor.toPlainText(), file_text)
+		else:
+			self.assertTrue(True, "File path not selected")
+
+	def test_verify_path(self):
+		text = "Lorem Ipsum dolor sit amet."
+		cursor = QTextCursor(self.window.current_editor.document())
+		cursor.insertText(text)
+
+		new_path, _ = QFileDialog.getSaveFileName(self.window, 'Save File As')
+		if new_path:
+			self.window._save_to_path(new_path)
+			current_path = self.window.path
+			self.assertEqual(current_path, new_path)
 			file = open(new_path, 'r')
 			file_text = file.read()
 			file.close()
@@ -153,6 +169,7 @@ class SupportFeatureTestCases(TestCase):
 		self.assertTrue(helpResonse, "Browser Launched")
 		# print(QTest.mouseClick(aboutWindow.buttonBox, Qt.LeftButton))
 		# self.assertTrue(self.window.isVisible() == False, "Not Visible")
+
 
 if __name__ == '__main__':
 	unittest.main()
