@@ -11,6 +11,10 @@ from pytestqt.plugin import qtbot
 
 from editor import MainWindow, QApplication
 
+"""
+	Test Suite for Testing File operations
+"""
+
 
 class FileOperationTests(TestCase):
 	@classmethod
@@ -23,11 +27,10 @@ class FileOperationTests(TestCase):
 	def tearDownClass(cls):
 		cls.app.exit()
 
-	###
-	#
-	#	TC_A_1
-	#
-	###
+	"""
+		Test to verify text content from opened file matches the contents in the file
+	"""
+
 	def test_file_open(self):
 		self.window._open_file_tab('/home/amey/test')
 		file = open('/home/amey/test', 'r')
@@ -36,11 +39,9 @@ class FileOperationTests(TestCase):
 
 		self.assertEqual(self.window.current_editor.toPlainText(), text)
 
-	###
-	#
-	#	TC_A_2
-	#
-	###
+	"""
+		Test to verify save method stores editor text to the file specified  
+	"""
 	def test_file_save(self):
 		text = "Lorem Ipsum dolor sit amet."
 		cursor = QTextCursor(self.window.current_editor.document())
@@ -53,6 +54,10 @@ class FileOperationTests(TestCase):
 		file.close()
 
 		self.assertEqual(self.window.current_editor.toPlainText(), file_text)
+
+	"""
+		Test to verify save method stores editor text to the file specified at given location  
+	"""
 
 	def test_file_save_as(self):
 		text = "Lorem Ipsum dolor sit amet."
@@ -69,6 +74,10 @@ class FileOperationTests(TestCase):
 			self.assertEqual(self.window.current_editor.toPlainText(), file_text)
 		else:
 			self.assertTrue(True, "File path not selected")
+
+	"""
+		Test to verify reopening the file loads content properly   
+	"""
 
 	def test_verify_path(self):
 		text = "Lorem Ipsum dolor sit amet."
@@ -88,6 +97,9 @@ class FileOperationTests(TestCase):
 			self.assertTrue(True, "File path not selected")
 
 
+"""
+	Test to verify text editor operations  
+"""
 class EditorOperationTests(TestCase):
 	@classmethod
 	def setUpClass(cls):
@@ -99,41 +111,37 @@ class EditorOperationTests(TestCase):
 	def tearDownClass(cls):
 		cls.app.exit()
 
-	###
-	#
-	#	TC_B_1
-	#
-	###
+	"""
+		Test to verify text editor operation:- cut paste  
+	"""
 	def test_cut(self):
 		text = "text"
 		self.write_data(text)
 		self.window.current_editor.selectAll()
 		self.window.cut_document()
+		self.assertEqual(self.window.current_editor.toPlainText(), "")
 		self.window.paste_document()
 		self.assertEqual(self.window.current_editor.toPlainText(), text)
 		self.window.paste_document()
 		self.assertEqual(self.window.current_editor.toPlainText(), "%s%s" % (text, text))
 
-	###
-	#
-	#	TC_B_2
-	#
-	###
+	"""
+		Test to verify text editor operation:- copy -> paste -> paste  
+	"""
 	def test_copy(self):
 		text = "text"
 		self.write_data(text)
 		self.window.current_editor.selectAll()
 		self.window.copy_document()
+		self.assertEqual(self.window.current_editor.toPlainText(), text)
 		self.window.paste_document()
 		self.assertEqual(self.window.current_editor.toPlainText(), "text")
 		self.window.paste_document()
 		self.assertEqual(self.window.current_editor.toPlainText(), "%s%s" % (text, text))
 
-	###
-	#
-	#	TC_B_3
-	#
-	###
+	"""
+		Testing File path matches from paths list for current tab
+	"""
 	def test_path(self):
 		index = self.window.tabs.currentIndex()
 		if index != -1:
@@ -141,12 +149,18 @@ class EditorOperationTests(TestCase):
 		else:
 			assert True
 
+	"""
+		Helper function to write data to insert text to an editor tab 
+	"""
 	def write_data(self, text):
 		self.window.add_new_tab()
 		cursor = QTextCursor(self.window.current_editor.document())
 		cursor.insertText(text)
 
 
+"""
+	Test suite for testing non-functional features such as About and Help
+"""
 class SupportFeatureTestCases(TestCase):
 	@classmethod
 	def setUpClass(cls):
@@ -158,17 +172,20 @@ class SupportFeatureTestCases(TestCase):
 	def tearDownClass(cls):
 		cls.app.exit()
 
+	"""
+		Test to verify visibility of About dialog
+	"""
 	def test_aboutDialogVisible(self):
 		aboutWindow = self.window.about()
-		self.assertTrue(self.window.isVisible(), "Visible")
-		# print(QTest.mouseClick(aboutWindow.buttonBox, Qt.LeftButton))
-		# self.assertTrue(self.window.isVisible() == False, "Not Visible")
+		print(aboutWindow.isVisible())
+		self.assertTrue(aboutWindow.isVisible(), "Visible")
 
+	"""
+		Test to verify help option triggers the browser window to open the documentation page site
+	"""
 	def test_help_launchWebBrowser(self):
-		helpResonse = self.window.help()
-		self.assertTrue(helpResonse, "Browser Launched")
-		# print(QTest.mouseClick(aboutWindow.buttonBox, Qt.LeftButton))
-		# self.assertTrue(self.window.isVisible() == False, "Not Visible")
+		helpResponse = self.window.help()
+		self.assertTrue(helpResponse, "Browser Launched")
 
 
 if __name__ == '__main__':

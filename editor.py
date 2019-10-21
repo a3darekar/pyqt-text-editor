@@ -143,6 +143,7 @@ class MainWindow(QMainWindow):
 			None,
 			('icons/question.png', 'Help (Ctrl + H)', self.help),
 		)
+
 		self.toolbar = self.addToolBar("Toolbar")
 
 		for item in items:
@@ -176,7 +177,7 @@ class MainWindow(QMainWindow):
 	def file_open(self):
 		path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Text documents (*.txt);All files (*.*)")
 		if path:
-			_open_file_tab(path)
+			self._open_file_tab(path)
 
 	def _open_file_tab(self, path):
 		try:
@@ -310,4 +311,4 @@ if __name__ == '__main__':
 	app.setApplicationName('Text Editor')
 
 	window = MainWindow()
-	app.exec_()
+	sys.exit(app.exec_())

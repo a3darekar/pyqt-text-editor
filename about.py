@@ -38,3 +38,4 @@ class AboutDialog(QDialog):
 		layout.addWidget(self.buttonBox)
 
 		self.setLayout(layout)
+		self.setVisible(True)
