@@ -214,6 +214,7 @@ class MainWindow(QMainWindow):
 
 	def add_new_tab(self, label='Untitled', text=''):
 		editor = self.create_editor(text)
+		label = str(label) if label else 'Untitled'
 		self.tabs.addTab(editor, label)
 		self.current_editor = editor
 		self.paths.append(label)
